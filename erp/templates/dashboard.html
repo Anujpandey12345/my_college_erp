@@ -1,0 +1,640 @@
+{% extends 'index.html' %} {% block exstyle %} {% load static %}
+
+<link href="{% static 'style/finaldashboard.css' %}" rel="stylesheet" />
+<!--current dateand time-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap"
+  rel="stylesheet"
+/>
+<!--boxicon-->
+<link
+  href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+  rel="stylesheet"
+/>
+<!--bootsrap-->
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<!--fontawesome-->
+<script
+  src="https://kit.fontawesome.com/8feaa5fbd6.js"
+  crossorigin="anonymous"
+></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
+  rel="stylesheet"
+/>
+<!--jquery-->
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+  charset="utf-8"
+></script>
+<!--chart-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<!--google material icon-->
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Icons"
+  rel="stylesheet"
+/>
+
+<!-- Custom Responsive Styles -->
+<style>
+  /* Mobile-first responsive improvements */
+  .home-section {
+    padding-left: 10px !important;
+  }
+
+  @media (min-width: 768px) {
+    .home-section {
+      padding-left: 20px !important;
+    }
+  }
+
+  /* Header responsiveness */
+  .home-content {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .home-content .text {
+    font-size: 1.2rem;
+    word-break: break-word;
+  }
+
+  @media (min-width: 768px) {
+    .home-content .text {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* DateTime section */
+  .datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  @media (min-width: 576px) {
+    .datetime {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+
+  .time,
+  .date {
+    color: #fff;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 768px) {
+    .time,
+    .date {
+      font-size: 1rem;
+    }
+  }
+
+  /* Card improvements */
+  .card-stats {
+    margin-bottom: 20px;
+    min-height: 120px;
+    transition: transform 0.2s ease;
+  }
+
+  .card-stats:hover {
+    transform: translateY(-2px);
+  }
+
+  .card-content h3 {
+    font-size: 1.5rem;
+    margin: 10px 0;
+  }
+
+  @media (max-width: 576px) {
+    .card-content h3 {
+      font-size: 1.2rem;
+    }
+
+    .card-content p {
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Chart container responsiveness */
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    margin-bottom: 20px;
+  }
+
+  @media (min-width: 768px) {
+    .chart-container {
+      height: 400px;
+    }
+  }
+
+  #myChart {
+    max-width: 100%;
+    height: auto !important;
+  }
+
+  /* Table responsiveness */
+  .table-responsive {
+    border: none;
+    box-shadow: none;
+  }
+
+  .table {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    .table {
+      font-size: 0.75rem;
+    }
+
+    .table th,
+    .table td {
+      padding: 8px 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+      max-width: 30px;
+    }
+  }
+
+  /* Todo list card */
+  .todo-card {
+    min-height: 300px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 992px) {
+    .todo-card {
+      margin-top: 20px;
+    }
+  }
+
+  /* Progress bar responsiveness */
+  .progress {
+    height: 6px;
+    margin-top: 10px;
+  }
+
+  /* Icon responsiveness */
+  .material-icons {
+    font-size: 2rem;
+  }
+
+  @media (max-width: 576px) {
+    .material-icons {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Utility classes for better spacing */
+  .mobile-padding {
+    padding: 0 10px;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-padding {
+      padding: 0 20px;
+    }
+  }
+
+  /* Ensure container fluid doesn't overflow */
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  @media (min-width: 768px) {
+    .container-fluid {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+  }
+</style>
+
+<!--googlechart-->
+<script>
+      const labels = [
+          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ];
+
+      const data = {
+          labels: labels,
+          datasets: [{
+              label: 'Number Of Projects Per Month',
+              backgroundColor: '#FF5F1F',
+              borderColor: '#FF5F1F',
+              data: [2, 10, 5, 2, 20, 30, 45, 40, 30, 20, 10, 5],
+          }]
+      };
+
+      const config = {
+          type: 'bar',
+          data: data,
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animations: {
+                  tension: {
+                      duration: 1000,
+                      easing: 'linear',
+                      from: 1,
+                      to: 0,
+                      loop: true
+                  }
+              },
+              scales: {
+                  y: {
+                      min: 0,
+                      max: 100,
+                      ticks: {
+                          color: '#fff'
+                      },
+                      grid: {
+                          color: 'rgba(255, 255, 255, 0.1)'
+                      }
+                  },
+                  x: {
+                      ticks: {
+                          color: '#fff',
+                          maxRotation: 45,
+                          minRotation: 0
+                      },
+                      grid: {
+                          color: 'rgba(255, 255, 255, 0.1)'
+                      }
+                  }
+              },
+              plugins: {
+                  legend: {
+                      labels: {
+                          color: '#fff'
+                      }
+                  }
+              }
+          }
+      };
+      .fade-in-up {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+      to {
+          opacity: 1;
+          transform: translateY(0);
+      }
+  }
+</script>
+{% endblock exstyle %} {% block dashboard %}
+
+<section class="home-section bg-black mobile-padding">
+  <div class="home-content">
+    <i class="bx bx-menu" style="color: #ff5f1f"></i>
+    {% block head-title %}
+    <span class="text" style="color: #fff">IMSEC "Build Tomorrow"</span>
+    {% endblock head-title %}
+  </div>
+
+  <div class="datetime bg-black">
+    <div class="time"></div>
+    <div class="date"></div>
+  </div>
+
+  <div class="main-content mt-3">
+    <div class="container-fluid bg-black">
+      <!-- Stats Cards Row -->
+      <div class="row g-3">
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+          <a href="{% url 'show_project_data' %}" style="text-decoration: none">
+            <div class="card card-stats bg-dark">
+              <div class="card-header">
+                <div class="icon icon-warning">
+                  <span class="material-icons">equalizer</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <p class="category"><strong>Projects</strong></p>
+                <h3 class="card-title">{{tot_proj}}</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+          <a
+            href="{% url 'showmeetingdetails' %}"
+            style="text-decoration: none"
+          >
+            <div class="card card-stats bg-dark">
+              <div class="card-header">
+                <div class="icon icon-rose">
+                  <span class="material-icons">meeting_room</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <p class="category"><strong>Meeting</strong></p>
+                <h3 class="card-title">{{Meeting}}</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+          <a href="{% url 'expense_list' %}" style="text-decoration: none">
+            <div class="card card-stats bg-dark">
+              <div class="card-header">
+                <div class="icon icon-success">
+                  <span class="material-icons">attach_money</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <p class="category"><strong>Computer Expense</strong></p>
+                <h3 class="card-title">{{revenue}}</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+          <a href="{% url 'addEmployee' %}" style="text-decoration: none">
+            <div class="card card-stats bg-dark">
+              <div class="card-header">
+                <div class="icon icon-info">
+                  <span class="material-icons">follow_the_signs</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <p class="category"><strong>Staff</strong></p>
+                <h3 class="card-title">{{staff}}</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+          <a href="{% url 'calender_default' %}" style="text-decoration: none">
+            <div class="card card-stats bg-dark">
+              <div class="card-header">
+                <div class="icon icon-success">
+                  <span class="material-icons">calendar_today</span>
+                </div>
+              </div>
+              <div class="card-content">
+                <p class="category"><strong>Calendar</strong></p>
+                <h3 class="card-title">{{total_expenses}}</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+          <a href="{% url 'attendance_report' %}" style="text-decoration: none">
+            <div class="card card-stats bg-dark">
+              <div class="card-header">
+                <div class="icon icon-info">
+                  <span class="material-icons">how_to_reg</span>
+                  <!-- Changed to attendance icon -->
+                </div>
+              </div>
+              <div class="card-content">
+                <p class="category"><strong>Attendance</strong></p>
+                <h3 class="card-title">{{ total_chats }}</h3>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Chart and Todo Section -->
+        <div class="col-lg-7 col-12">
+          <a href="{% url 'create_project' %}" style="text-decoration: none">
+            <div
+              class="card bg-dark text-white"
+              style="
+                min-height: 220px;
+                max-height: 220px;
+                min-width: 100%;
+                overflow: hidden;
+                border: 1px solid #17a2b8;
+              "
+            >
+              <div
+                class="card-header d-flex justify-content-between align-items-center"
+                style="border-bottom: 1px solid rgba(255, 255, 255, 0.1)"
+              >
+                <h4 class="card-title mb-0 text-white">Add Project</h4>
+                <i class="material-icons text-info" style="font-size: 28px"
+                  >add_circle_outline</i
+                >
+              </div>
+              <div
+                class="card-body d-flex flex-column justify-content-center align-items-center"
+              >
+                <i
+                  class="material-icons mb-3"
+                  style="font-size: 60px; color: #17a2b8"
+                  >assignment_turned_in</i
+                >
+                <p class="text-muted mb-0">Click here to add a new project</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-lg-5 col-12">
+          <a href="{% url 'taskpage' %}" style="text-decoration: none">
+            <div
+              class="card bg-dark todo-card text-white"
+              style="
+                min-height: 220px;
+                max-height: 220px;
+                min-width: 100%;
+                overflow: hidden;
+                border: 1px solid #ff8c00;
+              "
+            >
+              <div
+                class="card-header d-flex justify-content-between align-items-center"
+                style="border-bottom: 1px solid rgba(255, 255, 255, 0.1)"
+              >
+                <h4 class="card-title mb-0 text-white">To-Do List</h4>
+                <i class="material-icons text-warning" style="font-size: 28px"
+                  >check_circle</i
+                >
+              </div>
+              <div
+                class="card-body d-flex flex-column justify-content-center align-items-center"
+              >
+                <i
+                  class="material-icons mb-3"
+                  style="font-size: 60px; color: #ff8c00"
+                  >assignment</i
+                >
+                <p class="text-muted mb-0">View and manage your tasks</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-12 mt-3">
+          <div class="train-wrapper" style="text-align: center">
+            <a
+              href="https://chatgpt.com/"
+              style="text-decoration: none; color: inherit"
+            >
+              <h4
+                style="
+                  margin: 0;
+                  background: linear-gradient(
+                    45deg,
+                    #ff6b6b,
+                    #4ecdc4,
+                    #45b7d1,
+                    #96ceb4,
+                    #feca57
+                  );
+                  background-size: 300% 300%;
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                  animation: rocketBounce 2s ease-in-out infinite;
+                  animation-fill-mode: both;
+                "
+              >
+                🚀If You  Want to ask Any question then click on me 🚀
+              </h4>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Inline keyframes animation
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes rocketBounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(0deg); }
+      40% { transform: translateY(-10px) rotate(2deg); }
+      60% { transform: translateY(-5px) rotate(-1deg); }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+<script>
+  let arrow = document.querySelectorAll(".arrow");
+  for (var i = 0; i < arrow.length; i++) {
+    arrow[i].addEventListener("click", (e) => {
+      let arrowParent = e.target.parentElement.parentElement;
+      arrowParent.classList.toggle("showMenu");
+    });
+  }
+
+  let sidebar = document.querySelector(".sidebar");
+  let sidebarBtn = document.querySelector(".bx-menu");
+  if (sidebarBtn) {
+    sidebarBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+    });
+  }
+</script>
+
+<!--chart-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById("myChart");
+    if (ctx) {
+      const myChart = new Chart(ctx, config);
+
+      // Make chart responsive to window resize
+      window.addEventListener("resize", function () {
+        myChart.resize();
+      });
+    }
+  });
+</script>
+
+<!--current date and time-->
+<script>
+  const timeElement = document.querySelector(".time");
+  const dateElement = document.querySelector(".date");
+
+  function formatTime(date) {
+    const hours12 = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes();
+    const isAm = date.getHours() < 12;
+
+    return `${hours12.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")} ${isAm ? "AM" : "PM"}`;
+  }
+
+  function formatDate(date) {
+    const DAYS = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const MONTHS = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    return `${DAYS[date.getDay()]}, ${
+      MONTHS[date.getMonth()]
+    } ${date.getDate()} ${date.getFullYear()}`;
+  }
+
+  function updateDateTime() {
+    const now = new Date();
+    if (timeElement) timeElement.textContent = formatTime(now);
+    if (dateElement) dateElement.textContent = formatDate(now);
+  }
+
+  // Update immediately and then every second
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+</script>
+
+<!--bootstrap-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock dashboard %} {% block content %} {% endblock content %}

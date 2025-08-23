@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="Coding India">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMSEC GHAZIABAD</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css">
+
+    {% block style %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300&family=Tinos&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Enhanced Message Styles with Animations */
+        .messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .alert {
+            position: relative;
+            margin-bottom: 15px;
+            padding: 16px 20px 16px 60px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 1.5;
+            transform: translateX(100%);
+            opacity: 0;
+            animation: slideInRight 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            overflow: hidden;
+        }
+
+        .alert::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .alert::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'boxicons';
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Success Alert */
+        .alert-success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%);
+            color: #059669;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-success::before {
+            background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+        }
+
+        .alert-success::after {
+            content: '\ea08';
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        /* Primary Alert (treating as info) */
+        .alert-primary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+            color: #1d4ed8;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-primary::before {
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .alert-primary::after {
+            content: '\ea84';
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        /* Danger Alert */
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+            color: #dc2626;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-danger::before {
+            background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .alert-danger::after {
+            content: '\ea09';
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        /* Warning Alert */
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%);
+            color: #d97706;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-warning::before {
+            background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .alert-warning::after {
+            content: '\ea07';
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        /* Close button */
+        .alert .btn-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            color: inherit;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .alert .btn-close:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* Progress bar */
+        .alert-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .alert-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: currentColor;
+            border-radius: inherit;
+            transform: translateX(-100%);
+            animation: progressBar 5s linear forwards;
+        }
+
+        /* Animations */
+        @keyframes slideInRight {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes progressBar {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .alert.pulse {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        .alert.removing {
+            animation: slideOutRight 0.4s ease-in-out forwards;
+        }
+
+        /* Mobile responsiveness for messages */
+        @media (max-width: 768px) {
+            .messages {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+            
+            .alert {
+                padding: 14px 18px 14px 50px;
+                font-size: 13px;
+            }
+            
+            .alert::after {
+                width: 20px;
+                height: 20px;
+                font-size: 14px;
+                left: 15px;
+            }
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 240px;
+            background: #1B1212;
+            z-index: 100;
+            transition: all 0.5s ease;
+            opacity: 1;
+        }
+
+        .sidebar.close {
+            width: 75px;
+            opacity: 1;
+        }
+
+        .sidebar .logo-details {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .logo-details i {
+            font-size: 25px;
+            color: #fff;
+            height: 50px;
+            min-width: 78px;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        .sidebar .logo-details .logo_name {
+            position: relative;
+            margin-left: -40px;
+            color: #fff;
+            font-weight: 600;
+            transition: 0.3s ease;
+            transition-delay: 0.1s;
+        }
+
+        .sidebar.close .logo-details .logo_name {
+            transition-delay: 0s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar .nav-links {
+            height: 100%;
+            padding: 0 0 150px 0;
+            overflow: auto;
+        }
+
+        .sidebar.close .nav-links {
+            overflow: visible;
+        }
+
+        .sidebar .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar .nav-links li {
+            position: relative;
+            list-style: none;
+            transition: all 0.4s ease;
+        }
+
+        .sidebar .nav-links li:hover {
+            background: black;
+        }
+
+        .sidebar .nav-links li .icon-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar.close .nav-links li .icon-link {
+            display: block;
+        }
+
+        .sidebar .nav-links li i {
+            height: 50px;
+            min-width: 78px;
+            text-align: center;
+            line-height: 50px;
+            color: #EB7F23;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-links li.showMenu i.arrow {
+            transform: rotate(-180deg);
+        }
+
+        .sidebar.close .nav-links i.arrow {
+            display: none;
+        }
+
+        .sidebar .nav-links li a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .sidebar .nav-links li a .link_name {
+            font-size: 15px;
+            font-weight: 400;
+            color: #fff;
+            transition: all 0.4s ease;
+        }
+
+        .sidebar.close .nav-links li a .link_name {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar .nav-links li .sub-menu {
+            padding: 5px 6px 14px 80px;
+            margin-top: -10px;
+            background: #1E1E1E;
+            display: none;
+        }
+
+        .sidebar .nav-links li.showMenu .sub-menu {
+            display: block;
+        }
+
+        .sidebar .nav-links li .sub-menu a {
+            color: #fff;
+            font-size: 15px;
+            padding: 5px 0;
+            white-space: nowrap;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-links li .sub-menu a:hover {
+            opacity: 1;
+        }
+
+        .sidebar.close .nav-links li .sub-menu {
+            position: absolute;
+            left: 100%;
+            top: -10px;
+            margin-top: 0;
+            padding: 10px 20px;
+            border-radius: 0 6px 6px 0;
+            opacity: 0;
+            display: block;
+            pointer-events: none;
+            transition: 0s;
+        }
+
+        .sidebar.close .nav-links li:hover .sub-menu {
+            top: 0;
+            opacity: 1;
+            pointer-events: auto;
+            transition: all 0.4s ease;
+        }
+
+        .sidebar .nav-links li .sub-menu .link_name {
+            display: none;
+        }
+
+        .sidebar.close .nav-links li .sub-menu .link_name {
+            font-size: 18px;
+            opacity: 1;
+            display: block;
+        }
+
+        .sidebar .nav-links li .sub-menu.blank {
+            opacity: 1;
+            pointer-events: auto;
+            padding: 3px 20px 6px 16px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar .nav-links li:hover .sub-menu.blank {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .sidebar .profile-details {
+            position: fixed;
+            bottom: 0;
+            width: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #EB7F23;
+            padding: 12px 0;
+            transition: all 0.5s ease;
+        }
+
+        .sidebar.close .profile-details {
+            background: none;
+            width: 75px;
+        }
+
+        .sidebar .profile-details .profile-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .profile-details img {
+            height: 52px;
+            width: 52px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin: 0 14px 0 12px;
+            background: #EB7F23;
+            transition: all 0.5s ease;
+        }
+
+        .sidebar.close .profile-details img {
+            padding: 10px;
+        }
+
+        .sidebar .profile-details .profile_name,
+        .sidebar .profile-details .job {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .sidebar.close .profile-details i,
+        .sidebar.close .profile-details .profile_name,
+        .sidebar.close .profile-details .job {
+            display: none;
+        }
+
+        .sidebar .profile-details .job {
+            font-size: 12px;
+        }
+
+        .home-section {
+            position: relative;
+            height: 100%;
+            left: 240px;
+            width: calc(100% - 240px);
+            transition: all 0.5s ease;
+        }
+
+        .sidebar.close ~ .home-section {
+            left: 75px;
+            width: calc(100% - 75px);
+        }
+
+        .home-section .home-content {
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .home-section .home-content .bx-menu,
+        .home-section .home-content .text {
+            color: #EB7F23;
+            font-size: 30px;
+        }
+
+        .home-section .home-content .bx-menu {
+            margin: 0 15px;
+            cursor: pointer;
+        }
+
+        .home-section .home-content .text {
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -240px;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .sidebar.close {
+                left: -240px;
+                width: 240px;
+            }
+            
+            .home-section {
+                left: 0;
+                width: 100%;
+            }
+            
+            .sidebar.close ~ .home-section {
+                left: 0;
+                width: 100%;
+            }
+            
+            .home-section .home-content .text {
+                font-size: 20px;
+            }
+            
+            .sidebar .logo-details .logo_name img {
+                height: 100px;
+                width: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar.close .nav-links li .sub-menu {
+                display: none;
+            }
+            
+            .home-section .home-content .bx-menu,
+            .home-section .home-content .text {
+                font-size: 24px;
+            }
+            
+            .home-section .home-content .text {
+                font-size: 18px;
+            }
+            
+            .sidebar .nav-links li a .link_name {
+                font-size: 14px;
+            }
+            
+            .sidebar .nav-links li .sub-menu a {
+                font-size: 13px;
+            }
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+    {% endblock style %}
+
+    {% block exstyle %}
+    {% endblock exstyle %}
+</head>
+
+<body style="background-color: black; color: #EB7F23;">
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Enhanced Messages Container -->
+    {% if messages %}
+    <div class="messages" id="messagesContainer">
+      {% for message in messages %}
+        {% if message.tags == "success" %}
+        <div class="alert alert-success" data-auto-dismiss="5000">
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+            <div class="alert-progress"></div>
+            {{ message }}
+        </div>
+        {% elif message.tags == "error" or message.tags == "danger" %}
+        <div class="alert alert-danger" data-auto-dismiss="7000">
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+            <div class="alert-progress"></div>
+            {{ message }}
+        </div>
+        {% elif message.tags == "warning" %}
+        <div class="alert alert-warning" data-auto-dismiss="6000">
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+            <div class="alert-progress"></div>
+            {{ message }}
+        </div>
+        {% else %}
+        <div class="alert alert-primary" data-auto-dismiss="5000">
+            <button type="button" class="btn-close" aria-label="Close">&times;</button>
+            <div class="alert-progress"></div>
+            {{ message }}
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% load static %}
+
+    <div class="sidebar" id="sidebar">
+        <div class="logo-details" style="margin-bottom: 20px;">
+            <i class='bx bx-building-house mt-3 me-2' style="color: #EB7F23"></i>
+            <span class="logo_name mt-4"><img src="#" style="margin-top: -115px;" height="150" width="180px" alt="Company Logo"></span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="/">
+                    <i class='bx bx-home'></i>
+                    <span class="link_name">Home</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a class="link_name" href="/">Home</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="{% url 'calender_default' %}">
+                    <i class='bx bxs-calendar'></i>
+                    <span class="link_name">Calendar</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a class="link_name" href="#">Calendar</a></li>
+                </ul>
+            </li>
+            
+            <!-- Project -->
+            <li>
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bx-building-house'></i>
+                        <span class="link_name">Projects</span>
+                    </a>
+                    <i class='bx bxs-chevron-down arrow'></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a class="link_name" href="{% url 'create_project' %}">Projects</a></li>
+                    <li><a href="{% url 'create_project' %}">Add Project</a></li>
+                    <li><a href="{% url 'show_project_data' %}">View Projects</a></li>
+                </ul>
+            </li>
+
+            <!-- Meetings -->
+            <li>
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bxs-graduation'></i>
+                        <span class="link_name">Meeting</span>
+                    </a>
+                    <i class='bx bxs-chevron-down arrow'></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a class="link_name" href="{% url 'addmeeting' %}">Meeting</a></li>
+                    <li><a href="{% url 'addmeeting' %}">Add Meeting</a></li>
+                    <li><a href="{% url 'showmeetingdetails' %}">View Meetings</a></li>
+                </ul>
+            </li>
+            
+            <li>
+                <a href="{% url 'create_todo' %}">
+                    <i class='bx bx-task'></i>
+                    <span class="link_name">Tasks</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a class="link_name" href="#">Tasks</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <div class="icon-link">
+                    <a href="{% url 'take_attendance' %}">
+                        <i class='bx bx-user-pin'></i>
+                        <span class="link_name">Attendance</span>
+                    </a>
+                </div>
+            </li>
+
+            <li>
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bx-rupee'></i>
+                        <span class="link_name">Expenses</span>
+                    </a>
+                    <i class='bx bxs-chevron-down arrow'></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a class="link_name" href="#">Expenses</a></li>
+                    <li><a href="{% url 'expense_list' %}">Computer</a></li>
+                    <li><a href="{% url 'daily_expenses' %}">Daily</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bx-dollar'></i>
+                        <span class="link_name">Accounts</span>
+                    </a>
+                    <i class='bx bxs-chevron-down arrow'></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a class="link_name" href="#">Accounts</a></li>
+                    <li><a href="{% url 'Project_account'%}">Project</a></li>
+                    <li><a href="{% url 'Project_Expense' %}">Show Project Expense</a></li>
+                </ul>
+            </li>
+            
+            <li>
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bxs-user-circle'></i>
+                        <span class="link_name">Master</span>
+                    </a>
+                    <i class='bx bxs-chevron-down arrow'></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a class="link_name" href="#">Master</a></li>
+                    <li><a href="{% url 'showStaff' %}">Staff</a></li>
+                </ul>
+            </li>
+            
+            <li>
+                <a href="{% url 'addEmployee' %}">
+                    <i class='bx bx-user'></i>
+                    <span class="link_name">Staff</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a class="link_name" href="{% url 'addEmployee' %}">Staff</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <div class="profile-details">
+                    <div class="profile-content">
+                        <img src="https://github.com/Sacsam005/dropdown-menu/blob/master/image/profile.png?raw=true"
+                            alt="profileImg">
+                    </div>
+                    <div class="name-job">
+                        {% if user.is_authenticated %}
+                            <a href="#" class="profile_name">{{ user.username }}</a>
+                        {% else %}
+                            <a href="{% url 'loginview' %}" class="profile_name">Login</a>
+                        {% endif %}
+
+                    </div>
+                    <a href="{% url 'logout'%}"><i class='bx bx-log-out' style="color: black;"></i></a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    {% block dashboard %}
+    <section class="home-section">
+        <div class="home-content" style="background-color: black;">
+            {% block head-title %}
+            <i class='bx bx-menu' style="color: #EB7F23;" id="menuToggle"></i>
+            <span class="text" style="color: #EB7F23;">Dashboard</span>
+            {% endblock head-title %}
+        </div>
+    {% endblock dashboard %}
+
+    {% block content %}
+    <!-- Content will be inserted here by extending templates -->
+    
+    <!-- Demo buttons for testing messages (remove in production) -->
+    <div style="padding: 20px; margin-top: 20px;">
+        <h3 style="color: #EB7F23; margin-bottom: 20px;">Test Message Animations</h3>
+        <button onclick="showTestMessage('success')" style="background: #10b981; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 6px; cursor: pointer;">Success Message</button>
+        <button onclick="showTestMessage('danger')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 6px; cursor: pointer;">Error Message</button>
+        <button onclick="showTestMessage('warning')" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 6px; cursor: pointer;">Warning Message</button>
+        <button onclick="showTestMessage('primary')" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 6px; cursor: pointer;">Info Message</button>
+    </div>
+    
+    {% endblock content %}
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add CSRF token to HTMX requests
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+
+        // Enhanced Message System
+        class MessageManager {
+            constructor() {
+                this.container = document.getElementById('messagesContainer');
+                this.init();
+            }
+
+            init() {
+                // Auto-dismiss existing messages
+                this.initExistingMessages();
+                
+                // Add click handlers for close buttons
+                this.addCloseHandlers();
+            }
+
+            initExistingMessages() {
+                const alerts = document.querySelectorAll('.alert[data-auto-dismiss]');
+                alerts.forEach((alert, index) => {
+                    // Stagger the appearance of multiple messages
+                    setTimeout(() => {
+                        this.setupAutoDismiss(alert);
+                    }, index * 200);
+                });
+            }
+
+            setupAutoDismiss(alert) {
+                const dismissTime = parseInt(alert.dataset.autoDismiss) || 5000;
+                
+                // Set up auto-dismiss timer
+                const timer = setTimeout(() => {
+                    this.removeAlert(alert);
+                }, dismissTime);
+
+                // Pause timer on hover
+                alert.addEventListener('mouseenter', () => {
+                    clearTimeout(timer);
+                    alert.style.animationPlayState = 'paused';
+                });
+
+                // Resume timer on mouse leave
+                alert.addEventListener('mouseleave', () => {
+                    alert.style.animationPlayState = 'running';
+                    const remainingTime = dismissTime * 0.3; // Give some extra time
+                    setTimeout(() => {
+                        this.removeAlert(alert);
+                    }, remainingTime);
+                });
+
+                // Store timer reference for manual clearing
+                alert._dismissTimer = timer;
+            }
+
+            addCloseHandlers() {
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('btn-close')) {
+                        const alert = e.target.closest('.alert');
+                        if (alert) {
+                            this.removeAlert(alert);
+                        }
+                    }
+                });
+            }
+
+            removeAlert(alert) {
+                if (alert._dismissTimer) {
+                    clearTimeout(alert._dismissTimer);
+                }
+
+                alert.classList.add('

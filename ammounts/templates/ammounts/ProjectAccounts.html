@@ -1,0 +1,11 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="container" style="margin: auto 0; text-align: center;">
+    <h1>Add Your Project Expense</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Project</button>
+    </form>
+</div>
+{% endblock content %}
