@@ -14,7 +14,7 @@ def student_list(request):
             messages.success(request, "Student added successfully.")
             return redirect('student_list')
     
-    return render(request, 'attendance/student_list.html', {
+    return render(request, 'Attendance/student_list.html', {
         'students': students,
         'form': form
     })
@@ -38,8 +38,8 @@ def take_attendance(request):
         messages.success(request, "Attendance submitted successfully.")
         return redirect('attendance_report')
     
-    return render(request, 'attendance/take_attendance.html', {'students': students})
+    return render(request, 'Attendance/take_attendance.html', {'students': students})
 
 def attendance_report(request):
     records = Attendance.objects.select_related('student').order_by('-date', 'student__roll_number')
-    return render(request, 'attendance/attendance_report.html', {'records': records})
+    return render(request, 'Attendance/attendance_report.html', {'records': records})
